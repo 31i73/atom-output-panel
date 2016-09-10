@@ -2,7 +2,7 @@
 
 A bottom output panel for hosting processing and displaying output
 
-![A screenshot of your package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
+![Output Panel screenshot](http://i.imgur.com/e57nAJp.png)
 
 ## Commands:
 
