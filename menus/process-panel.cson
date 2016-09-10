@@ -1,11 +1,11 @@
 # See https://atom.io/docs/latest/hacking-atom-package-word-count#menus for more details
-'context-menu':
-	'atom-text-editor': [
-		{
-			'label': 'Toggle Output'
-			'command': 'output-panel:toggle'
-		}
-	]
+# 'context-menu':
+# 	'atom-text-editor': [
+# 		{
+# 			'label': 'Toggle Output'
+# 			'command': 'output-panel:toggle'
+# 		}
+# 	]
 'menu': [
 	{
 		'label': 'Packages'
