@@ -1,32 +1,30 @@
 {
-	"name": "output-panel",
-	"main": "./lib/main",
-	"version": "0.0.0",
-	"description": "A bottom output panel for hosting processing and displaying output",
-	"keywords": [
-	],
-	"repository": "https://github.com/31i73/atom-output-panel",
-	"license": "MIT",
-	"engines": {
-		"atom": ">=1.0.0 <2.0.0"
-	},
-	"keywords": [
-		"output",
-		"bottom",
-		"panel",
-		"process",
-		"terminal"
-	],
-	"dependencies": {
-		"xterm": "^1.1.3",
-		"cross-spawn": "^4.0.0"
+  "name": "output-panel",
+  "main": "./lib/main",
+  "version": "0.1.0",
+  "description": "A bottom output panel for hosting processing and displaying output",
+  "keywords": [
+    "output",
+    "bottom",
+    "panel",
+    "process",
+    "terminal"
+  ],
+  "repository": "https://github.com/31i73/atom-output-panel",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+    "xterm": "^1.1.3",
+    "cross-spawn": "^4.0.0"
   },
   "providedServices": {
-		"output-panel": {
-			"description": "Allows control of an output panel",
-			"versions": {
-				"0.1.0": "provideOutputPanel"
-			}
-		}
+    "output-panel": {
+      "description": "Allows control of an output panel",
+      "versions": {
+        "0.1.0": "provideOutputPanel"
+      }
+    }
   }
 }
