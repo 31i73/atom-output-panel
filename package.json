@@ -14,7 +14,8 @@
 		"output",
 		"bottom",
 		"panel",
-		"process"
+		"process",
+		"terminal"
 	],
 	"dependencies": {
 		"xterm": "^1.1.3",
