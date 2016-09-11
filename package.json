@@ -2,7 +2,7 @@
   "name": "output-panel",
   "main": "./lib/main",
   "version": "0.1.0",
-  "description": "A bottom output panel for hosting processing and displaying output",
+  "description": "A bottom output panel for running processes and displaying output",
   "keywords": [
     "output",
     "bottom",

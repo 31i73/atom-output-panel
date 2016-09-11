@@ -1,6 +1,6 @@
 # output-panel package
 
-A bottom output panel for hosting processing and displaying output
+A bottom output panel for running processes and displaying output
 
 ![Output Panel screenshot](http://i.imgur.com/e57nAJp.png)
 
