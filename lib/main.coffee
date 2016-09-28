@@ -69,8 +69,13 @@ module.exports = ProcessPanel =
 			@show()
 
 		else if(show=='auto')
-			@process.stdout.once 'data', =>
+			firstOutput = =>
+				@process.stdout.removeListener 'data', firstOutput
+				@process.stderr.removeListener 'data', firstOutput
 				@show()
+
+			@process.stdout.on 'data', firstOutput
+			@process.stderr.on 'data', firstOutput
 
 		return @process
 
