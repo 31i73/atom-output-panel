@@ -85,7 +85,7 @@ module.exports = ProcessPanel =
 			@process = null
 
 	provideOutputPanel: ->
-		isVisible: => return @atomPanel.isVisible()
+		isVisible: => return @atomPanel?.isVisible()||false
 		run: @run.bind this
 		stop: @stop.bind this
 		show: @show.bind this
