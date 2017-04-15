@@ -3,7 +3,6 @@
 module.exports = ProcessPanel =
 	process: null
 	panel: null
-	atomPanel: null
 	subscriptions: null
 
 	activate: ->
@@ -17,39 +16,52 @@ module.exports = ProcessPanel =
 		@subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:stop': => @stop()
 		@subscriptions.add atom.commands.add 'atom-workspace', 'core:cancel': => @hide()
 
-	initialise: ->
-		@initialise = => {}
-
-		{Panel} = require './view/Panel'
-
-		@panel = new Panel
-		@panel.emitter.on 'close', =>
-			@hide()
-		@atomPanel = atom.workspace.addBottomPanel item: @panel.getElement(), visible: false
-
 	deactivate: ->
 		@subscriptions.dispose()
-		@atomPanel?.destroy()
-		@panel?.destroy()
+		if @panel then atom.workspace.hide @panel
 
 	show: ->
-		@initialise()
-		@atomPanel.show()
-		@panel.terminal.emit 'resize'
+		if !@panel
+			{Panel} = require './view/Panel'
+
+			@panel = new Panel
+			@panel.emitter.on 'destroyed', => @panel = null
+
+			(atom.workspace.open @panel, searchAllPanes: true).then =>
+				if @panel then @_onItemResize @panel, => @panel?.resize()
 
 	hide: ->
-		@atomPanel?.hide()
+		if @panel
+			pane = atom.workspace.paneForItem @panel
+			if pane then pane.destroyItem @panel
+			@panel = null
 
 	toggle: ->
-		if @atomPanel?.isVisible()
-			@hide()
-		else
-			# @run true, 'ls', ['--color', '-lh']
-			@show()
+		if @panel then @hide() else @show()
+
+	_onItemResize: (item, callback) ->
+		observer = null
+
+		if wrapper = item.element.closest '.atom-dock-content-wrapper'
+			observer = new MutationObserver => callback()
+			observer.observe wrapper, attributes: true
+
+		windowCallback = => callback()
+		window.addEventListener 'resize', windowCallback
+
+		if pane = atom.workspace.paneForItem item
+			pane.observeFlexScale => item.resize()
+			pane.onDidRemoveItem (event) =>
+				if event.item == item
+					observer?.disconnect()
+					window.removeEventListener 'resize', windowCallback
+					if !event.removed
+						setTimeout =>
+							@_onItemResize event.item, callback
+						,1
 
 	run: (show, path, args, options) ->
 		@initialise()
-
 		@stop()
 
 		{spawn} = require 'cross-spawn'
@@ -85,15 +97,14 @@ module.exports = ProcessPanel =
 			@process = null
 
 	provideOutputPanel: ->
-		isVisible: => return @atomPanel?.isVisible()||false
+		isVisible: => return @panel!=null
 		run: @run.bind this
 		stop: @stop.bind this
 		show: @show.bind this
 		hide: @hide.bind this
 		toggle: @toggle.bind this
 		print: =>
-			@initialise()
+			@show()
 			@panel.print.apply @panel, arguments
 		clear: =>
-			@initialise()
-			@panel.clear.apply @panel, arguments
+			@panel?.clear.apply @panel, arguments

@@ -7,37 +7,6 @@ class @Panel
 		@element = document.createElement 'div'
 		@element.classList.add 'output-panel', 'tool-panel'
 
-		@resizer = document.createElement 'div'
-		@resizer.classList.add 'resizer'
-		@resizer.addEventListener 'mousedown', =>
-			document.body.style['-webkit-user-select'] = 'none'
-
-			onMove = (event) =>
-				rect = @resizer.getBoundingClientRect()
-				delta = (rect.top + rect.bottom)/2 - event.y
-				@resize Math.round @terminal.element.clientHeight+delta
-
-			onRelease = (event) =>
-				document.removeEventListener 'mousemove', onMove
-				document.removeEventListener 'mouseup', onRelease
-
-			document.addEventListener 'mousemove', onMove
-			document.addEventListener 'mouseup', onRelease
-
-		@element.appendChild @resizer
-
-		header = document.createElement 'div'
-		header.classList.add 'panel-heading'
-		header.textContent = 'Output'
-		@element.appendChild header
-
-		closeButton = document.createElement 'button'
-		closeButton.classList.add 'btn', 'action-close', 'icon', 'icon-remove-close'
-		header.appendChild closeButton
-
-		closeButton.addEventListener 'click', =>
-			@emitter.emit 'close'
-
 		@body = document.createElement 'div'
 		@body.classList.add 'panel-body'
 
@@ -57,21 +26,25 @@ class @Panel
 		@terminal.open @body
 		@terminal.end = -> {}
 
-		window.addEventListener 'resize', => @resize()
 		@resize()
 
+	getTitle: -> 'Output'
+	getDefaultLocation: -> 'bottom'
+
 	resize: (height) ->
+		width = @element.clientWidth
 		if !height
-			height = @terminal.element.clientHeight
+			height = @element.clientHeight
 
 		rect = @terminal.viewport.charMeasureElement.getBoundingClientRect()
 
-		cols = Math.floor @terminal.element.clientWidth/rect.width
+		cols = Math.floor width/rect.width
 		rows = Math.floor height/rect.height
 
 		@terminal.resize cols||80, rows||8
 
 	destroy: ->
+		@emitter.emit 'destroyed'
 		@element.remove()
 
 	getElement: ->
