@@ -20,16 +20,21 @@ module.exports = ProcessPanel =
 		@panel?.destroy()
 		@subscriptions.dispose()
 
-	show: -> new Promise (fulfill) =>
+	_create: -> new Promise (fulfill) =>
 		if !@panel
 			{Panel} = require './view/Panel'
 
 			@panel = new Panel
 			@panel.onDidDestroy => @panel = null
-
-		(atom.workspace.open @panel, searchAllPanes: true).then =>
-			if @panel then @_onItemResize @panel, => @panel?.resize()
+			(atom.workspace.open @panel, searchAllPanes: true).then =>
+				if @panel then @_onItemResize @panel, => @panel?.resize()
+				fulfill()
+		else
 			fulfill()
+
+	show: -> new Promise (fulfill) =>
+		@_create().then =>
+			atom.workspace.show @panel if @panel
 
 	hide: ->
 		atom.workspace.hide @panel if @panel
@@ -102,7 +107,7 @@ module.exports = ProcessPanel =
 		hide: @hide.bind this
 		toggle: @toggle.bind this
 		print: (line) =>
-			@show().then =>
+			@_create().then =>
 				@panel?.print line
 		clear: =>
 			@panel?.clear()
