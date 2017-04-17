@@ -17,27 +17,25 @@ module.exports = ProcessPanel =
 		@subscriptions.add atom.commands.add 'atom-workspace', 'core:cancel': => @hide()
 
 	deactivate: ->
+		@panel?.destroy()
 		@subscriptions.dispose()
-		if @panel then atom.workspace.hide @panel
 
-	show: ->
+	show: -> new Promise (fulfill) =>
 		if !@panel
 			{Panel} = require './view/Panel'
 
 			@panel = new Panel
-			@panel.emitter.on 'destroyed', => @panel = null
+			@panel.onDidDestroy => @panel = null
 
-			(atom.workspace.open @panel, searchAllPanes: true).then =>
-				if @panel then @_onItemResize @panel, => @panel?.resize()
+		(atom.workspace.open @panel, searchAllPanes: true).then =>
+			if @panel then @_onItemResize @panel, => @panel?.resize()
+			fulfill()
 
 	hide: ->
-		if @panel
-			pane = atom.workspace.paneForItem @panel
-			if pane then pane.destroyItem @panel
-			@panel = null
+		atom.workspace.hide @panel if @panel
 
 	toggle: ->
-		if @panel then @hide() else @show()
+		if !@panel || !atom.workspace.hide @panel then @show()
 
 	_onItemResize: (item, callback) ->
 		observer = null
@@ -103,8 +101,8 @@ module.exports = ProcessPanel =
 		show: @show.bind this
 		hide: @hide.bind this
 		toggle: @toggle.bind this
-		print: =>
-			@show()
-			@panel.print.apply @panel, arguments
+		print: (line) =>
+			@show().then =>
+				@panel?.print line
 		clear: =>
-			@panel?.clear.apply @panel, arguments
+			@panel?.clear()

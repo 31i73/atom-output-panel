@@ -44,8 +44,11 @@ class @Panel
 		@terminal.resize cols||80, rows||8
 
 	destroy: ->
-		@emitter.emit 'destroyed'
 		@element.remove()
+		@emitter.emit 'didDestroy'
+
+	onDidDestroy: (callback) ->
+		@emitter.on 'didDestroy', callback
 
 	getElement: ->
 		@element
