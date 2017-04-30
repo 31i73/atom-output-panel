@@ -26,15 +26,14 @@ module.exports = ProcessPanel =
 
 			@panel = new Panel
 			@panel.onDidDestroy => @panel = null
-			(atom.workspace.open @panel, searchAllPanes: true).then =>
+
+		atom.workspace.open @panel, searchAllPanes: true
+			.then =>
 				if @panel then @_onItemResize @panel, => @panel?.resize()
 				fulfill()
-		else
-			fulfill()
 
 	show: -> new Promise (fulfill) =>
-		@_create().then =>
-			atom.workspace.show @panel if @panel
+		return @_create()
 
 	hide: ->
 		atom.workspace.hide @panel if @panel
