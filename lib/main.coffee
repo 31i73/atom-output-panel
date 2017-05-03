@@ -18,6 +18,18 @@ module.exports =
 		# @subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:stop': => @stop()
 		@subscriptions.add atom.commands.add 'atom-workspace', 'core:cancel': => @hide()
 
+		@subscriptions.add atom.commands.add '.output-panel .terminal', 'core:copy': (event) =>
+			event.stopPropagation()
+			@copy()
+
+		@subscriptions.add atom.commands.add '.output-panel .terminal', 'core:paste': (event) =>
+			event.stopPropagation()
+			@paste()
+
+		@subscriptions.add atom.commands.add '.output-panel .terminal', 'core:select-all': (event) =>
+			event.stopPropagation()
+			@selectAll()
+
 		@interactiveSessions = []
 
 		@pty = Pty.open {
@@ -59,6 +71,14 @@ module.exports =
 			@panel.print data, newline
 		else #but if it doesn't exist then spawn a new one (and show it), before printing the text
 			@_create().then => @panel?.print data, newline
+
+	copy: -> @panel?.copy()
+
+	paste: ->
+		if @panel and @panel.is_interactive
+			@pty.write atom.clipboard.read()
+
+	selectAll: -> @panel?.selectAll()
 
 	_onItemResize: (item, callback) ->
 		observer = null

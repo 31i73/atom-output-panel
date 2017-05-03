@@ -13,3 +13,9 @@
 		]
 	}
 ]
+'context-menu':
+	'.output-panel .terminal': [
+		{ 'label': 'Copy', 'command': 'core:copy' }
+		{ 'label': 'Paste', 'command': 'core:paste' }
+		{ 'label': 'Select All', 'command': 'core:select-all' }
+	]

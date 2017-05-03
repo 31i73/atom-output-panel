@@ -30,6 +30,34 @@ class @Panel
 			if @is_interactive
 				@main.pty.write data
 
+		@terminal.attachCustomKeydownHandler (event) =>
+			# ctrl-a
+			if event.key=='a' and event.ctrlKey and !event.shiftKey and !event.altKey
+				event.preventDefault()
+				event.stopPropagation()
+				@selectAll()
+				return false
+
+			# ctrl-c / ctrl-insert
+			else if (
+				event.key=='c' and event.ctrlKey and !event.shiftKey and !event.altKey ||
+				event.key=='Insert' and event.ctrlKey and !event.shiftKey and !event.altKey
+			) and window.getSelection().toString()
+				event.preventDefault()
+				event.stopPropagation()
+				@main.copy()
+				return false
+
+			# ctrl-v / shift-insert
+			else if (
+				event.key=='v' and event.ctrlKey and !event.shiftKey and !event.altKey||
+				event.key=='Insert' and !event.ctrlKey and event.shiftKey and !event.altKey
+			)
+				event.preventDefault()
+				event.stopPropagation()
+				@main.paste()
+				return false
+
 		@terminal.open @body
 
 		if @main.interactiveSessions.length
@@ -63,6 +91,21 @@ class @Panel
 			@terminal.writeln line
 		else
 			@terminal.write line
+
+	selectAll: ->
+		range = document.createRange()
+		range.selectNodeContents (@body.getElementsByClassName 'xterm-rows')[0]
+		selection = window.getSelection()
+		selection.removeAllRanges()
+		selection.addRange range
+
+	copy: ->
+		selection = window.getSelection()
+		selected = selection.toString()
+		selected = selected.replace /\xa0/g, ' '
+		selected = selected.replace /\s+(\n|$)/g,'$1'
+		atom.clipboard.write selected
+		selection.removeAllRanges() #clear all selections for neatness
 
 	setInteractive: (set) ->
 		if @is_interactive = set
