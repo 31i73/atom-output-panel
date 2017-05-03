@@ -29,7 +29,7 @@ Returns an object with the following functions:
 
 Returns a `child_process` compatible object of the running process
 
-`stop()` - Stop and process currently running in the panel
+`stop()` - Stop any process currently running in the panel
 
 `show()` - Display the panel
 
@@ -37,6 +37,14 @@ Returns a `child_process` compatible object of the running process
 
 `toggle()` - Toggle the panel
 
-`print(line:String)` - Print a `line` of text to the panel
+`print(line:String, ?newline=true)` - Print a `line` of text to the panel, followed by an optional `newline` (default)
 
 `clear()` - Clear the panel
+
+`getInteractiveSession()` - Returns an `InteractiveSession` for retrieving user input. This session must be freed with `discard` when no longer used.
+
+### InteractiveSession
+
+`discard()` - Free this session
+
+`pty` - The pty instance of this session (see https://www.npmjs.com/package/node-pty for more details)

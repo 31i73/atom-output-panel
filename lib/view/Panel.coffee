@@ -1,7 +1,9 @@
 {Emitter} = require 'atom'
 
 class @Panel
-	constructor: ->
+	constructor: (main) ->
+		@main = main
+		@is_interactive = false
 		@emitter = new Emitter()
 
 		@element = document.createElement 'div'
@@ -13,18 +15,25 @@ class @Panel
 		@element.appendChild @body
 
 		XTerm = require 'xterm'
+		XTerm.loadAddon 'fit'
 
 		@terminal = new XTerm {
 			cursorBlink: false
 			visualBell: true
 			convertEol: true
 			termName: 'xterm-256color'
-			scrollback: 1000,
+			scrollback: 1000
 			rows: 8
 		}
 
+		@terminal.on 'data', (data) =>
+			if @is_interactive
+				@main.pty.write data
+
 		@terminal.open @body
-		@terminal.end = -> {}
+
+		if @main.interactiveSessions.length
+			@setInteractive true
 
 		@resize()
 
@@ -32,16 +41,9 @@ class @Panel
 	getDefaultLocation: -> 'bottom'
 
 	resize: (height) ->
-		width = @element.clientWidth
-		if !height
-			height = @element.clientHeight
-
-		rect = @terminal.viewport.charMeasureElement.getBoundingClientRect()
-
-		cols = Math.floor width/rect.width
-		rows = Math.floor height/rect.height
-
-		@terminal.resize cols||80, rows||8
+		size = @terminal.proposeGeometry()
+		@terminal.resize size.cols||80, size.rows||8
+		@main.pty.resize size.cols||80, size.rows||8
 
 	destroy: ->
 		@element.remove()
@@ -56,5 +58,16 @@ class @Panel
 	clear: ->
 		@terminal.reset()
 
-	print: (line) ->
-		@terminal.writeln line
+	print: (line, newline = true) ->
+		if newline
+			@terminal.writeln line
+		else
+			@terminal.write line
+
+	setInteractive: (set) ->
+		if @is_interactive = set
+			@terminal.setOption 'cursorBlink', true
+			@terminal.showCursor()
+		else
+			@terminal.setOption 'cursorBlink', false
+			# @terminal.hideCursor() # function apparently does not exist..

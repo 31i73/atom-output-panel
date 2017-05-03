@@ -1,6 +1,8 @@
 {CompositeDisposable} = require 'atom'
+Pty = require 'node-pty'
+{InteractiveSession} = require './InteractiveSession'
 
-module.exports = ProcessPanel =
+module.exports =
 	process: null
 	panel: null
 	subscriptions: null
@@ -16,6 +18,17 @@ module.exports = ProcessPanel =
 		@subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:stop': => @stop()
 		@subscriptions.add atom.commands.add 'atom-workspace', 'core:cancel': => @hide()
 
+		@interactiveSessions = []
+
+		@pty = Pty.open {
+			name: 'xterm-256color'
+			cols: 80
+			rows: 8
+		}
+
+		@pty.on 'data', (data) =>
+			@print data, false
+
 	deactivate: ->
 		@panel?.destroy()
 		@subscriptions.dispose()
@@ -24,7 +37,7 @@ module.exports = ProcessPanel =
 		if !@panel
 			{Panel} = require './view/Panel'
 
-			@panel = new Panel
+			@panel = new Panel this
 			@panel.onDidDestroy => @panel = null
 
 		atom.workspace.open @panel, searchAllPanes: true
@@ -40,6 +53,12 @@ module.exports = ProcessPanel =
 
 	toggle: ->
 		if !@panel || !atom.workspace.hide @panel then @show()
+
+	print: (data, newline = true) ->
+		if @panel # print if panel exists, but to not neccasarily show (in case of minimisation)
+			@panel.print data, newline
+		else #but if it doesn't exist then spawn a new one (and show it), before printing the text
+			@_create().then => @panel?.print data, newline
 
 	_onItemResize: (item, callback) ->
 		observer = null
@@ -98,6 +117,9 @@ module.exports = ProcessPanel =
 			@process.kill()
 			@process = null
 
+	getInteractiveSession: ->
+		return new InteractiveSession this
+
 	provideOutputPanel: ->
 		isVisible: => return @panel!=null
 		run: @run.bind this
@@ -105,8 +127,7 @@ module.exports = ProcessPanel =
 		show: @show.bind this
 		hide: @hide.bind this
 		toggle: @toggle.bind this
-		print: (line) =>
-			@_create().then =>
-				@panel?.print line
+		print: @print.bind this
 		clear: =>
 			@panel?.clear()
+		getInteractiveSession: @getInteractiveSession.bind this
