@@ -10,7 +10,7 @@ A bottom output panel for running processes and displaying output
 `output-panel:hide` - Hide the panel  
 `output-panel:toggle` - Toggle the panel  
 `output-panel:run` - TODO: prompt the user to run a program in the panel  
-`output-panel:stop` - Stop any program currently running in the panel  
+`output-panel:stop` - TODO: Stop any program currently running in the panel  
 `core:cancel` - Hide the panel  
 
 ## Service: `output-panel`

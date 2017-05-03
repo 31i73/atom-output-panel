@@ -12,10 +12,10 @@ module.exports =
 		@subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:show': => @show()
 		@subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:hide': => @hide()
 		@subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:toggle': => @toggle()
-		@subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:run': => {
-			#TODO:prompt for something to run
-		}
-		@subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:stop': => @stop()
+		# @subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:run': => {
+		# 	#TODO:prompt for something to run
+		# }
+		# @subscriptions.add atom.commands.add 'atom-workspace', 'output-panel:stop': => @stop()
 		@subscriptions.add atom.commands.add 'atom-workspace', 'core:cancel': => @hide()
 
 		@interactiveSessions = []
