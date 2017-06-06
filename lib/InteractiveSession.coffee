@@ -1,5 +1,4 @@
 {Emitter} = require 'atom'
-Pty = require 'node-pty'
 
 class @InteractiveSession
 	constructor: (main) ->

@@ -1,5 +1,7 @@
 {CompositeDisposable} = require 'atom'
-Pty = require 'node-pty'
+Pty = null
+Pty = require 'node-pty' if process.platform!='win32'
+
 {InteractiveSession} = require './InteractiveSession'
 
 module.exports =
@@ -32,13 +34,13 @@ module.exports =
 
 		@interactiveSessions = []
 
-		@pty = Pty.open {
+		@pty = Pty?.spawn null, null, {
 			name: 'xterm-256color'
 			cols: 80
 			rows: 8
 		}
 
-		@pty.on 'data', (data) =>
+		@pty?.on 'data', (data) =>
 			@print data, false
 
 	deactivate: ->
@@ -76,7 +78,7 @@ module.exports =
 
 	paste: ->
 		if @panel and @panel.is_interactive
-			@pty.write atom.clipboard.read()
+			@pty?.write atom.clipboard.read()
 
 	selectAll: -> @panel?.selectAll()
 

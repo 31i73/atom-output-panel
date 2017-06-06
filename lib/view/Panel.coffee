@@ -28,7 +28,7 @@ class @Panel
 
 		@terminal.on 'data', (data) =>
 			if @is_interactive
-				@main.pty.write data
+				@main.pty?.write data
 
 		@terminal.attachCustomKeydownHandler (event) =>
 			# ctrl-a
@@ -71,7 +71,7 @@ class @Panel
 	resize: (height) ->
 		size = @terminal.proposeGeometry()
 		@terminal.resize size.cols||80, size.rows||8
-		@main.pty.resize size.cols||80, size.rows||8
+		@main.pty?.resize size.cols||80, size.rows||8
 
 	destroy: ->
 		@element.remove()
