@@ -34,7 +34,7 @@ module.exports =
 
 		@interactiveSessions = []
 
-		@pty = Pty?.spawn null, null, {
+		@pty = Pty?.open {
 			name: 'xterm-256color'
 			cols: 80
 			rows: 8
