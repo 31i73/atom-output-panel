@@ -1,10 +1,11 @@
 {CompositeDisposable} = require 'atom'
 Pty = null
 
-if process.platform!='win32' try
-	Pty = require 'node-pty'
-catch
-	Pty = null
+if process.platform!='win32'
+	try
+		Pty = require 'node-pty'
+	catch
+		Pty = null
 
 {InteractiveSession} = require './InteractiveSession'
 
