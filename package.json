@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "xterm": "^2.5.0",
-    "cross-spawn": "^4.0.0",
+    "cross-spawn": "^4.0.0"
+  },
+  "optionalDependencies": {
     "node-pty": "^0.6.0"
   },
   "providedServices": {
