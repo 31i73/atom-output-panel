@@ -1,7 +1,7 @@
 {
   "name": "output-panel",
   "main": "./lib/main",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A bottom output panel for running processes and displaying output",
   "keywords": [
     "output",
