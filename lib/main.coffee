@@ -109,7 +109,6 @@ module.exports =
 						,1
 
 	run: (show, path, args, options) ->
-		@initialise()
 		@stop()
 
 		{spawn} = require 'cross-spawn'
