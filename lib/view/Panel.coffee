@@ -14,10 +14,12 @@ class @Panel
 
 		@element.appendChild @body
 
-		XTerm = require 'xterm'
-		XTerm.loadAddon 'fit'
+		XtermAddonFit = require 'xterm-addon-fit'
+		# fitAddon = new XtermFitAddon()
 
-		@terminal = new XTerm {
+		XTerm = require 'xterm'
+
+		@terminal = new XTerm.Terminal {
 			cursorBlink: false
 			visualBell: true
 			convertEol: true
@@ -25,38 +27,41 @@ class @Panel
 			scrollback: 1000
 			rows: 8
 		}
+		@terminalFit = new XtermAddonFit.FitAddon
+		@terminal.loadAddon @terminalFit
 
-		@terminal.on 'data', (data) =>
+		@terminal.onData = (data) =>
 			if @is_interactive
 				@main.pty?.write data
 
-		@terminal.attachCustomKeydownHandler (event) =>
-			# ctrl-a
-			if event.key=='a' and event.ctrlKey and !event.shiftKey and !event.altKey
-				event.preventDefault()
-				event.stopPropagation()
-				@selectAll()
-				return false
+		@terminal.attachCustomKeyEventHandler (event) =>
+			if event.type == 'keydown'
+				# ctrl-a
+				if event.key=='a' and event.ctrlKey and !event.shiftKey and !event.altKey
+					event.preventDefault()
+					event.stopPropagation()
+					@selectAll()
+					return false
 
-			# ctrl-c / ctrl-insert
-			else if (
-				event.key=='c' and event.ctrlKey and !event.shiftKey and !event.altKey ||
-				event.key=='Insert' and event.ctrlKey and !event.shiftKey and !event.altKey
-			) and window.getSelection().toString()
-				event.preventDefault()
-				event.stopPropagation()
-				@main.copy()
-				return false
+				# ctrl-c / ctrl-insert
+				else if (
+					event.key=='c' and event.ctrlKey and !event.shiftKey and !event.altKey ||
+					event.key=='Insert' and event.ctrlKey and !event.shiftKey and !event.altKey
+				) and window.getSelection().toString()
+					event.preventDefault()
+					event.stopPropagation()
+					@main.copy()
+					return false
 
-			# ctrl-v / shift-insert
-			else if (
-				event.key=='v' and event.ctrlKey and !event.shiftKey and !event.altKey||
-				event.key=='Insert' and !event.ctrlKey and event.shiftKey and !event.altKey
-			)
-				event.preventDefault()
-				event.stopPropagation()
-				@main.paste()
-				return false
+				# ctrl-v / shift-insert
+				else if (
+					event.key=='v' and event.ctrlKey and !event.shiftKey and !event.altKey||
+					event.key=='Insert' and !event.ctrlKey and event.shiftKey and !event.altKey
+				)
+					event.preventDefault()
+					event.stopPropagation()
+					@main.paste()
+					return false
 
 		@terminal.open @body
 
@@ -69,9 +74,10 @@ class @Panel
 	getDefaultLocation: -> 'bottom'
 
 	resize: (height) ->
-		size = @terminal.proposeGeometry()
-		@terminal.resize size.cols||80, size.rows||8
-		@main.pty?.resize size.cols||80, size.rows||8
+		size = @terminalFit.proposeDimensions()
+		size = {cols:80, rows:80} if !size
+		@terminal.resize size.cols, size.rows
+		@main.pty?.resize size.cols, size.rows
 
 	destroy: ->
 		@element.remove()
@@ -110,7 +116,7 @@ class @Panel
 	setInteractive: (set) ->
 		if @is_interactive = set
 			@terminal.setOption 'cursorBlink', true
-			@terminal.showCursor()
+			# @terminal.showCursor()
 		else
 			@terminal.setOption 'cursorBlink', false
 			# @terminal.hideCursor() # function apparently does not exist..

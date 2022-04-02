@@ -1,5 +1,11 @@
 {CompositeDisposable} = require 'atom'
-Pty = require 'node-pty'
+Pty = null
+
+if process.platform!='win32'
+	try
+		Pty = require 'node-pty'
+	catch
+		Pty = null
 
 {InteractiveSession} = require './InteractiveSession'
 
@@ -55,7 +61,9 @@ module.exports =
 
 		atom.workspace.open @panel, searchAllPanes: true
 			.then =>
-				if @panel then @_onItemResize @panel, => @panel?.resize()
+				if @panel
+					@_onItemResize @panel, => @panel?.resize()
+					@panel.resize()
 				fulfill()
 
 	show: -> new Promise (fulfill) =>
